@@ -1,0 +1,11 @@
+{
+    "name": "fazland/rabbitd-symfony-executor-plugin",
+    "require": {
+        "symfony/process": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Fazland\\RabbitdPlugins\\SymfonyExecutor\\": "./"
+        }
+    }
+}

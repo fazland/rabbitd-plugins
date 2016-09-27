@@ -1,0 +1,8 @@
+services:
+    fazland.plugins.symfony_executor_listener:
+        class: Fazland\RabbitdPlugins\SymfonyExecutor\MessageListener
+        arguments:
+            - '@rabbitd.plugins.symfony-executor.logger'
+            - '%symfony_app%'
+        tags:
+            - { name: event_subscriber }
