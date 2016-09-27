@@ -80,7 +80,7 @@ class MessageListener implements EventSubscriberInterface
 
         $process = ProcessBuilder::create($cmdline)
             ->setInput(json_encode($stdin))
-            ->setTimeout(null)
+            ->setTimeout(300)
             ->getProcess();
 
         $this->logger->info('Executing '.$process->getCommandLine());
