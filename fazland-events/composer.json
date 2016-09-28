@@ -1,0 +1,10 @@
+{
+    "name": "fazland/rabbitd-fazland-events-plugin",
+    "require": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Fazland\\RabbitdPlugins\\FazlandEvents\\": "./"
+        }
+    }
+}

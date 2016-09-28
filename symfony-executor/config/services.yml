@@ -1,8 +1,20 @@
 services:
-    fazland.plugins.symfony_executor_listener:
-        class: Fazland\RabbitdPlugins\SymfonyExecutor\MessageListener
+    fazland.plugins.symfony_executor.process_builder:
+        class: Fazland\RabbitdPlugins\SymfonyExecutor\Process\Builder
+        arguments:
+            - '%symfony_app%'
+        public: false
+
+    fazland.plugins.symfony_executor.process_executor:
+        class: Fazland\RabbitdPlugins\SymfonyExecutor\Process\Executor
         arguments:
             - '@rabbitd.plugins.symfony-executor.logger'
-            - '%symfony_app%'
+        public: false
+
+    fazland.plugins.symfony_executor_listener:
+        class: Fazland\RabbitdPlugins\SymfonyExecutor\Listener\MessageListener
+        arguments:
+            - '@fazland.plugins.symfony_executor.process_builder'
+            - '@fazland.plugins.symfony_executor.process_executor'
         tags:
             - { name: event_subscriber }

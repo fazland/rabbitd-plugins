@@ -1,0 +1,14 @@
+services:
+    fazland.plugins.fazland_events.process_executor:
+        class: Fazland\RabbitdPlugins\SymfonyExecutor\Process\Executor
+        arguments:
+            - '@rabbitd.plugins.fazland-events.logger'
+        public: false
+
+    fazland.plugins.fazland_events_listener:
+        class: Fazland\RabbitdPlugins\FazlandEvents\MessageListener
+        arguments:
+            - '@fazland.plugins.symfony_executor.process_builder'
+            - '@fazland.plugins.fazland_events.process_executor'
+        tags:
+            - { name: event_subscriber }
