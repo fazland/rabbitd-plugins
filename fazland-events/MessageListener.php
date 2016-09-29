@@ -41,19 +41,21 @@ class MessageListener implements EventSubscriberInterface
     {
         $msg = $event->getMessage();
 
-        $message = Silencer::call('json_decode', $msg->body, true);
+        $message = Silencer::call('json_decode', $msg->getBody(), true);
         if (false === $message || $message['type'] !== 'event') {
             return;
         }
 
         if (! isset($message['args'])) {
             $event->setProcessed();
+
             return;
         }
 
         $message['args'] = Silencer::call('json_decode', $message['args'], true);
         if (false === $message['args'] || ! isset($message['args']['event_type'])) {
             $event->setProcessed();
+
             return;
         }
 

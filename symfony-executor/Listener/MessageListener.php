@@ -41,9 +41,10 @@ class MessageListener implements EventSubscriberInterface
     {
         $msg = $event->getMessage();
 
-        $message = Silencer::call('json_decode', $msg->body, true);
+        $body = $msg->getBody();
+        $message = Silencer::call('json_decode', $body, true);
         if (false === $message) {
-            $message = Silencer::call('unserialize', $msg->body);
+            $message = Silencer::call('unserialize', $body);
         }
 
         if (false === $message) {
