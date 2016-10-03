@@ -17,7 +17,9 @@ class SymfonyExecutorPlugin extends AbstractPlugin
     {
         $root
             ->children()
-                ->scalarNode('symfony_app')->isRequired()->end()
+                ->scalarNode('symfony_app')
+                    ->defaultValue('/var/www/symfony/app/console')
+                ->end()
             ->end()
         ;
     }

@@ -21,10 +21,16 @@ class ErrorHandlerPlugin extends AbstractPlugin
      */
     public function onStart(ContainerBuilder $container)
     {
+        $configuration = $container->getParameter('error_handler');
+        $configuration['enabled'] = null !== $configuration['enabled'] ? $configuration['enabled'] : ! empty($configuration['error_queue']);
+
+        if (! $configuration['enabled']) {
+            return;
+        }
+
         $loader = $this->getContainerLoader($container, __DIR__.'/config');
         $loader->load('services.yml');
 
-        $configuration = $container->getParameter('error_handler');
         $queueName = $configuration['queue'];
 
         $container->findDefinition('plugins.error_handler.doctrine.entity_mananger')
@@ -55,7 +61,8 @@ class ErrorHandlerPlugin extends AbstractPlugin
                 ->arrayNode('error_handler')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->scalarNode('queue')->defaultValue('default')->isRequired()->end()
+                        ->booleanNode('enabled')->defaultNull()->end()
+                        ->scalarNode('queue')->isRequired()->end()
                         ->arrayNode('connection')
                             ->addDefaultsIfNotSet()
                             ->children()
