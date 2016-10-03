@@ -1,0 +1,11 @@
+{
+    "name": "fazland/rabbitd-error-handler-plugin",
+    "require": {
+        "doctrine/orm": "2.5.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Fazland\\RabbitdPlugins\\ErrorHandler\\": "./"
+        }
+    }
+}

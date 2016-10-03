@@ -1,0 +1,25 @@
+services:
+    plugins.error_handler.doctrine.metadata_cache:
+        class: Doctrine\Common\Cache\ArrayCache
+
+    plugins.error_handler.doctrine.configuration:
+        class: Doctrine\ORM\Configuration
+        factory: ['Doctrine\ORM\Tools\Setup', 'createConfiguration']
+        arguments:
+            - false
+            - ~
+            - '@plugins.error_handler.doctrine.metadata_cache'
+
+    plugins.error_handler.doctrine.annotations_driver:
+        class: Doctrine\ORM\Mapping\Driver\AnnotationDriver
+        factory: ['@plugins.error_handler.doctrine.configuration', 'newDefaultAnnotationDriver']
+        arguments:
+            - '%rabbitd.plugins.error-handler.root_dir%/Entity'
+            - false
+
+    plugins.error_handler.doctrine.entity_mananger:
+        class: Doctrine\ORM\EntityManager
+        factory: ['Doctrine\ORM\EntityManager', 'create']
+        arguments:
+            - ~
+            - '@plugins.error_handler.doctrine.configuration'

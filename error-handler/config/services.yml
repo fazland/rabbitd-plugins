@@ -1,0 +1,30 @@
+imports:
+    - { resource: services/ }
+
+services:
+    plugins.error_handler.error_listener:
+        class: Fazland\RabbitdPlugins\ErrorHandler\Listener\ErrorListener
+        arguments:
+            - '@plugins.error_handler.queue.connection'
+            - '%plugins.error_handler.queue_name%'
+            - '@plugins.error_handler.error_holder'
+        calls:
+            - ['setLogger', ['@rabbitd.plugins.error-handler.logger']]
+        tags:
+            - { name: event_subscriber }
+
+    plugins.error_handler.error_holder:
+        class: Fazland\RabbitdPlugins\ErrorHandler\ErrorMessageHolder
+        arguments:
+            - '%plugins.error_handler.queue_name%'
+            - '@plugins.error_handler.doctrine.entity_mananger'
+        tags:
+            - { name: event_subscriber }
+
+#    plugins.error_handler.queue:
+#        class: Fazland\Rabbitd\Queue\AmqpLibQueue
+#        arguments:
+#            - '@rabbitd.plugins.fazland-events.logger'
+#            - '@plugins.error_handler.queue.connection'
+#            - '%plugins.error_handler.queue_name%'
+#            - '@event_dispatcher'
