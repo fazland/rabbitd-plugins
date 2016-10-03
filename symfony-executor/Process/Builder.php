@@ -24,7 +24,10 @@ class Builder
     {
         array_unshift($arguments, $this->symfonyApp);
 
-        return $this->buildProcess($arguments, $stdin);
+        $process = $this->buildProcess($arguments, $stdin);
+        $process->setWorkingDirectory(dirname($this->symfonyApp));
+
+        return $process;
     }
 
     /**
