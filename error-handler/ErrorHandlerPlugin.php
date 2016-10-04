@@ -17,12 +17,17 @@ use Symfony\Component\DependencyInjection\Reference;
 class ErrorHandlerPlugin extends AbstractPlugin
 {
     /**
+     * @var bool
+     */
+    private $enabled = true;
+
+    /**
      * {@inheritdoc}
      */
     public function onStart(ContainerBuilder $container)
     {
         $configuration = $container->getParameter('error_handler');
-        $configuration['enabled'] = null !== $configuration['enabled'] ? $configuration['enabled'] : ! empty($configuration['error_queue']);
+        $this->enabled = $configuration['enabled'] = null !== $configuration['enabled'] ? $configuration['enabled'] : ! empty($configuration['queue']);
 
         if (! $configuration['enabled']) {
             return;
@@ -90,6 +95,10 @@ class ErrorHandlerPlugin extends AbstractPlugin
      */
     public function registerCommands(Application $application)
     {
+        if (! $this->enabled) {
+            return;
+        }
+
         $entityManager = $application->getKernel()->getContainer()->get('plugins.error_handler.doctrine.entity_mananger');
         $application->getHelperSet()->set(new ConnectionHelper($entityManager->getConnection()), 'db');
         $application->getHelperSet()->set(new EntityManagerHelper($entityManager), 'em');
