@@ -90,6 +90,16 @@ class ErrorListener implements EventSubscriberInterface
             return;
         }
 
+        $nested_message = Silencer::call('unserialize', $body['message']);
+        if ($nested_message) {
+            $nested_message = Silencer::call('json_decode', $nested_message, true);
+        }
+
+        if ($nested_message && isset($nested_message['type']) && $nested_message['type'] === 'faz_errored_message') {
+            $event->setProcessed();
+            return;
+        }
+
         $this->holder->addMessage($msg);
 
         $msg->setNeedAck(false);
