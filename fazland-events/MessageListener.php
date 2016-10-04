@@ -63,6 +63,8 @@ class MessageListener implements EventSubscriberInterface
         unset($message['args']['event_type']);
 
         $arguments = ['fazland:event', $event_type, json_encode($message['args'])];
+        $arguments[] = '--env='.(isset($message['env']) ? $message['env'] : 'prod');
+
         $process = $this->processBuilder->getSymfonyProcess($arguments);
 
         $this->processExecutor->execute($process);
