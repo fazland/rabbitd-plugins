@@ -7,7 +7,7 @@ use Doctrine\ORM\Tools\Console\ConsoleRunner;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use Fazland\Rabbitd\Application\Application;
 use Fazland\Rabbitd\Plugin\AbstractPlugin;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Connection\AbstractConnection;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -49,7 +49,7 @@ class ErrorHandlerPlugin extends AbstractPlugin
             throw new InvalidConfigurationException('Error queue must be specified');
         }
 
-        $container->register('plugins.error_handler.queue.connection', AMQPStreamConnection::class)
+        $container->register('plugins.error_handler.queue.connection', AbstractConnection::class)
             ->setFactory([new Reference('connection_manager'), 'getConnection'])
             ->setArguments([$queue['connection']]);
         $container->setParameter('plugins.error_handler.queue_name', $queue['queue_name']);
@@ -106,6 +106,31 @@ class ErrorHandlerPlugin extends AbstractPlugin
         ConsoleRunner::addCommands($application);
 
         return parent::registerCommands($application);
+    }
+
+    public function prependConfiguration(array $configuration)
+    {
+        $config = $configuration['error_handler'];
+        $enabled = isset($config['enabled']) ? $config['enabled'] : ! empty($config['queue']);
+
+        if (! $enabled || ! $config['queue'] || isset($configuration['queues'][$config['queue']])) {
+            return [];
+        }
+
+        return [
+            'queues' => [
+                $config['queue'] => [
+                    'queue_name' => 'com.fazland.production.error_queue',
+                    'exchange' => [
+                        'name' => $config['queue'],
+                        'type' => 'x-delayed-message',
+                        'arguments' => [
+                            'x-delayed-type' => 'fanout'
+                        ]
+                    ]
+                ]
+            ]
+        ];
     }
 
     /**

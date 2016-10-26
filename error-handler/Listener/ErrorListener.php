@@ -10,7 +10,7 @@ use Fazland\Rabbitd\Queue\QueueInterface;
 use Fazland\Rabbitd\Util\Silencer;
 use Fazland\RabbitdPlugins\ErrorHandler\ErrorMessageGeneratorTrait;
 use Fazland\RabbitdPlugins\ErrorHandler\ErrorMessageHolder;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Connection\AbstractConnection;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
@@ -38,11 +38,11 @@ class ErrorListener implements EventSubscriberInterface
     private $queueName;
 
     /**
-     * @var AMQPStreamConnection
+     * @var AbstractConnection
      */
     private $connection;
 
-    public function __construct(AMQPStreamConnection $connection, $queueName, ErrorMessageHolder $holder)
+    public function __construct(AbstractConnection $connection, $queueName, ErrorMessageHolder $holder)
     {
         $this->holder = $holder;
         $this->queueName = $queueName;
