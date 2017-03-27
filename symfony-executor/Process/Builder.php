@@ -18,6 +18,7 @@ class Builder
     public function __construct($symfonyApp)
     {
         $this->symfonyApp = $symfonyApp;
+        $this->argMax = DIRECTORY_SEPARATOR === '\\' ? 32767 : (int)`getconf ARG_MAX`;
     }
 
     public function getSymfonyProcess(array $arguments, $stdin = null)
@@ -38,6 +39,12 @@ class Builder
      */
     public function buildProcess(array $arguments, $stdin = null)
     {
+        foreach ($arguments as $k => $arg) {
+            if (strlen($arg) >= $this->argMax) {
+                throw new \RuntimeException('Argument '.$k.' exceeds allowed size of '.$this->argMax.'. Aborting execution...');
+            }
+        }
+
         $builder = SymfonyBuilder::create($arguments);
         $builder->setTimeout(300);
 

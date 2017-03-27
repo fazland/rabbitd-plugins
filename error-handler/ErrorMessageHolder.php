@@ -102,7 +102,7 @@ class ErrorMessageHolder implements EventSubscriberInterface
             if (! $event->isProcessed()) {
                 throw new MessageUnprocessedException($wrappedMsg);
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $attempt = $body['attempt'];
             switch ($attempt) {
                 case 1:
