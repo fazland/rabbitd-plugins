@@ -110,6 +110,10 @@ class ErrorHandlerPlugin extends AbstractPlugin
 
     public function prependConfiguration(array $configuration)
     {
+        if (! isset($configuration['error_handler'])) {
+            $configuration['error_handler'] = [];
+        }
+
         $config = $configuration['error_handler'];
         $enabled = isset($config['enabled']) ? $config['enabled'] : ! empty($config['queue']);
 
