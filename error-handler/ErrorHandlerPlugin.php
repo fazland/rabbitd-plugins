@@ -27,7 +27,7 @@ class ErrorHandlerPlugin extends AbstractPlugin
     public function onStart(ContainerBuilder $container)
     {
         $configuration = $container->getParameter('error_handler');
-        $this->enabled = $configuration['enabled'] = null !== $configuration['enabled'] ? $configuration['enabled'] : ! empty($configuration['queue']);
+        $this->enabled = $configuration['enabled'];
 
         if (! $configuration['enabled']) {
             return;
@@ -64,6 +64,15 @@ class ErrorHandlerPlugin extends AbstractPlugin
         $root
             ->children()
                 ->arrayNode('error_handler')
+                    ->validate()
+                        ->ifTrue(function ($val) {
+                            return null === $val['enabled'] && ! empty($val['queue']);
+                        })
+                        ->then(function ($val) {
+                            $val['enabled'] = true;
+                            return $val;
+                        })
+                    ->end()
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->booleanNode('enabled')->defaultNull()->end()
@@ -95,11 +104,13 @@ class ErrorHandlerPlugin extends AbstractPlugin
      */
     public function registerCommands(Application $application)
     {
-        if (! $this->enabled) {
+        $container = $application->getKernel()->getContainer();
+        $configuration = $container->getParameter('error_handler');
+        if (! $configuration['enabled']) {
             return;
         }
 
-        $entityManager = $application->getKernel()->getContainer()->get('plugins.error_handler.doctrine.entity_mananger');
+        $entityManager = $container->get('plugins.error_handler.doctrine.entity_mananger');
         $application->getHelperSet()->set(new ConnectionHelper($entityManager->getConnection()), 'db');
         $application->getHelperSet()->set(new EntityManagerHelper($entityManager), 'em');
 
